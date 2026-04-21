@@ -1,0 +1,33 @@
+databaseType = "PostgreSql"
+id = "a31395a1-0e00-484a-b5f0-3843d57c6970"
+name = "product_db"
+
+[flyway]
+callbackLocations = [ "filesystem:callbacks" ]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+[flywayDesktop]
+enableMigrations = true
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+
+  [flywayDesktop.generate]
+  undoScripts = false
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.behavior]
+detectRenames = "identical-only"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.product-db-local]
+url = "jdbc:postgresql://localhost:5433/product_db_local"
+user = "johannajonsson"
+schemas = [ "public" ]
