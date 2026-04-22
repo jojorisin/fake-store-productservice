@@ -88,8 +88,8 @@ public class ProductService {
       product.updateImage(request.image());
       log.info("Product {} updated with image {}", productId, request.image());
     }
-
-    return productMapper.toProductDTO(productRepository.save(product));
+    productRepository.save(product);
+    return productMapper.toProductDTO(product);
   }
 
   public ProductDTO getProductById(Long productId) {
@@ -97,8 +97,10 @@ public class ProductService {
         productRepository.findById(productId).orElseThrow(IllegalArgumentException::new));
   }
 
-  public void deleteProductById(Long productId) {
-    productRepository.deleteById(productId);
+  public void deleteProduct(Long productId) {
+    log.info("Deleting product {}", productId);
+    Product product = getProductOrThrow(productId);
+    productRepository.delete(product);
     log.info("Product {} deleted", productId);
   }
 
