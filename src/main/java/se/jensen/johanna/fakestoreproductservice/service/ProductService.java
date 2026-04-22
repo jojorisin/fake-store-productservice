@@ -1,6 +1,9 @@
 package se.jensen.johanna.fakestoreproductservice.service;
 
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,27 +24,41 @@ import se.jensen.johanna.fakestoreproductservice.repository.ProductRepository;
 public class ProductService {
 
   @Value("${fake-store-url}")
-  private String fakeStoreurl;
+  private String fakeStoreUrl;
   private final ProductMapper productMapper;
   private final ProductRepository productRepository;
-  private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate;
 
   @Transactional
   public void syncProducts() {
     log.info("Syncing products from fake store");
-    int syncedProducts = 1;
-    ProductDTO[] products = restTemplate.getForObject(fakeStoreurl, ProductDTO[].class);
-    if (products != null) {
-      for (ProductDTO product : products) {
-        if (!productRepository.existsById(product.id())) {
-          productRepository.save(productMapper.toProduct(product));
-          syncedProducts++;
-        }
+
+    try {
+      ProductDTO[] remoteProducts = restTemplate.getForObject(fakeStoreUrl, ProductDTO[].class);
+      if (remoteProducts == null) {
+        log.warn("Product sync aborted: Returned null from {}", fakeStoreUrl);
+        return;
+      }
+      if (remoteProducts.length == 0) {
+        log.info("Product sync skipped. No products returned from {}.", fakeStoreUrl);
+        return;
       }
 
-    }
-    log.info("Synced {} products", syncedProducts);
+      Set<Long> existingIds = productRepository.findAllIds();
+      List<Product> newProducts = Arrays.stream(remoteProducts)
+          .filter(remote -> !existingIds.contains(remote.id())).map(productMapper::toProduct)
+          .toList();
 
+      if (!newProducts.isEmpty()) {
+        productRepository.saveAll(newProducts);
+        log.info("Successfully synced {} new products from {}", newProducts.size(), fakeStoreUrl);
+      } else {
+        log.info("No new unique products found in {}", fakeStoreUrl);
+      }
+
+    } catch (Exception e) {
+      log.error("Failed to sync products from fake store {}", e.getMessage(), e);
+    }
   }
 
   @Transactional(readOnly = true)
@@ -52,20 +69,27 @@ public class ProductService {
   @Transactional
   public ProductDTO updateProduct(Long productId, UpdateProductRequest request) {
     Product product = getProductOrThrow(productId);
+    log.info("Updating product {}, request: {}", productId, request);
+
     if (request.title() != null && !request.title().isBlank()) {
       product.updateTitle(request.title());
+      log.info("Product {} updated with title {}", productId, request.title());
     }
     if (request.description() != null && !request.description().isBlank()) {
       product.updateDescription(request.description());
+      log.info("Product {} updated with description {}", productId, request.description());
     }
     if (request.price() != null) {
+      log.info("Updating price: current price {}, product {}", product.getPrice(), productId);
       product.updatePrice(request.price());
+      log.info("Product {} updated with price {}", productId, request.price());
     }
     if (request.image() != null && !request.image().isBlank()) {
       product.updateImage(request.image());
+      log.info("Product {} updated with image {}", productId, request.image());
     }
-    return productMapper.toProductDTO(productRepository.save(product));
 
+    return productMapper.toProductDTO(productRepository.save(product));
   }
 
   public ProductDTO getProductById(Long productId) {
@@ -75,10 +99,14 @@ public class ProductService {
 
   public void deleteProductById(Long productId) {
     productRepository.deleteById(productId);
+    log.info("Product {} deleted", productId);
   }
 
   private Product getProductOrThrow(Long productId) {
-    return productRepository.findById(productId).orElseThrow(IllegalArgumentException::new);
+    return productRepository.findById(productId).orElseThrow(() -> {
+      log.error("Product {} not found", productId);
+      return new IllegalArgumentException("Product not found");
+    });
   }
 }
 
