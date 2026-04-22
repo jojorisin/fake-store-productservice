@@ -10,12 +10,12 @@ import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 public class Product {
 
   @Id
+  @EqualsAndHashCode.Include
   private Long id;
   private String title;
   private Integer price;
@@ -41,6 +42,22 @@ public class Product {
   @PreUpdate
   protected void onUpdate() {
     this.updatedAt = Instant.now();
+  }
+
+  public void updateTitle(String title) {
+    this.title = title;
+  }
+
+  public void updatePrice(Integer price) {
+    this.price = price;
+  }
+
+  public void updateDescription(String description) {
+    this.description = description;
+  }
+
+  public void updateImage(String image) {
+    this.image = image;
   }
 
 }
