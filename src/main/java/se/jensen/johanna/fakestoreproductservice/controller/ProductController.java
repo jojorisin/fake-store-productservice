@@ -1,17 +1,23 @@
 package se.jensen.johanna.fakestoreproductservice.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.jensen.johanna.fakestoreproductservice.dto.ProductDTO;
+import se.jensen.johanna.fakestoreproductservice.dto.UpdateProductRequest;
 import se.jensen.johanna.fakestoreproductservice.service.ProductService;
 
 @RestController
@@ -28,8 +34,20 @@ public class ProductController {
   }
 
   @GetMapping("/{productId}")
-  public ResponseEntity<ProductDTO> getProductById(Long productId) {
+  public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
     return ResponseEntity.ok(productService.getProductById(productId));
+  }
+
+  @PutMapping("/{productId}")
+  public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId,
+      @Valid @RequestBody UpdateProductRequest request) {
+    return ResponseEntity.ok(productService.updateProduct(productId, request));
+  }
+
+  @DeleteMapping("/{productId}")
+  public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+    productService.deleteProductById(productId);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/sync")
