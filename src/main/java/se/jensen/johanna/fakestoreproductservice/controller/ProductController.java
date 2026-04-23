@@ -22,7 +22,7 @@ import se.jensen.johanna.fakestoreproductservice.dto.UpdateProductRequest;
 import se.jensen.johanna.fakestoreproductservice.service.ProductService;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
 
