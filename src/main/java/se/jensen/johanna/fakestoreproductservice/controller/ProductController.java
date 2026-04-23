@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.jensen.johanna.fakestoreproductservice.dto.ProductDTO;
 import se.jensen.johanna.fakestoreproductservice.dto.UpdateProductRequest;
@@ -29,8 +30,9 @@ public class ProductController {
 
   @GetMapping
   public ResponseEntity<Page<ProductDTO>> getAllProducts(
+      @RequestParam(name = "q", required = false, defaultValue = "") String query,
       @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-    return ResponseEntity.ok(productService.getAllProducts(pageable));
+    return ResponseEntity.ok(productService.getAllProducts(query, pageable));
   }
 
   @GetMapping("/{productId}")

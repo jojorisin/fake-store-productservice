@@ -62,8 +62,8 @@ public class ProductService {
   }
 
   @Transactional(readOnly = true)
-  public Page<ProductDTO> getAllProducts(Pageable pageable) {
-    return productRepository.findAll(pageable).map(productMapper::toProductDTO);
+  public Page<ProductDTO> getAllProducts(String query, Pageable pageable) {
+    return productRepository.findAll(query, pageable).map(productMapper::toProductDTO);
   }
 
   @Transactional
