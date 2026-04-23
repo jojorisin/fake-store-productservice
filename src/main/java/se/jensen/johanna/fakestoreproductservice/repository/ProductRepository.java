@@ -11,7 +11,11 @@ import se.jensen.johanna.fakestoreproductservice.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-  Page<Product> findAll(Pageable pageable);
+  @Query("SELECT p FROM Product p WHERE " +
+      "(:query IS NULL OR :query = '' OR " +
+      "LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+      "LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%')))")
+  Page<Product> findAll(String query, Pageable pageable);
 
   @Query("SELECT p.id FROM Product p")
   Set<Long> findAllIds();

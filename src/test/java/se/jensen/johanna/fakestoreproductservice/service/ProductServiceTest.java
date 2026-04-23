@@ -2,6 +2,7 @@ package se.jensen.johanna.fakestoreproductservice.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,20 +50,20 @@ class ProductServiceTest {
     productDTO = new ProductDTO(productId, "title", 100, "description", "image");
   }
 
+
   @Test
-  void getAllProducts() {
-    Page<Product> productPage = new PageImpl<>(List.of(product));
+  void getAllProducts_WithSearchQuery() {
+    String search = "original";
     Pageable pageable = PageRequest.of(0, 10);
-    when(productRepository.findAll(pageable)).thenReturn(productPage);
+    Page<Product> productPage = new PageImpl<>(List.of(product));
+
+    when(productRepository.findAll(eq(search), eq(pageable))).thenReturn(productPage);
     when(productMapper.toProductDTO(product)).thenReturn(productDTO);
 
-    Page<ProductDTO> result = productService.getAllProducts(pageable);
-    
-    assertThat(result).isNotNull();
-    assertThat(result.getContent()).hasSize(1);
-    assertThat(result.getContent().get(0).title()).isEqualTo(productDTO.title());
+    Page<ProductDTO> result = productService.getAllProducts(search, pageable);
 
-    verify(productRepository).findAll(pageable);
+    assertThat(result.getContent()).hasSize(1);
+    verify(productRepository).findAll(search, pageable);
   }
 
   @Test
