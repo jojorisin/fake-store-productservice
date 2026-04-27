@@ -1,0 +1,1 @@
+ALTER TABLE reservations RENAME COLUMN reserved_stock_id TO reservation_id;

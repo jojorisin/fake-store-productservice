@@ -2,6 +2,7 @@ package se.jensen.johanna.fakestoreproductservice.controller;
 
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import se.jensen.johanna.fakestoreproductservice.dto.AvailabilityRequest;
+import se.jensen.johanna.fakestoreproductservice.dto.AvailabilityResponse;
 import se.jensen.johanna.fakestoreproductservice.dto.ProductDTO;
 import se.jensen.johanna.fakestoreproductservice.dto.UpdateProductRequest;
 import se.jensen.johanna.fakestoreproductservice.service.ProductService;
+import se.jensen.johanna.fakestoreproductservice.service.ReservationService;
 
 @RestController
 @RequestMapping("/api/products")
@@ -27,6 +31,7 @@ import se.jensen.johanna.fakestoreproductservice.service.ProductService;
 public class ProductController {
 
   private final ProductService productService;
+  private final ReservationService reservationService;
 
   @GetMapping
   public ResponseEntity<Page<ProductDTO>> getAllProducts(
@@ -36,25 +41,38 @@ public class ProductController {
   }
 
   @GetMapping("/{productId}")
-  public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
+  public ResponseEntity<ProductDTO> getProductById(@PathVariable UUID productId) {
     return ResponseEntity.ok(productService.getProductById(productId));
   }
 
   @PutMapping("/{productId}")
-  public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId,
+  public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID productId,
       @Valid @RequestBody UpdateProductRequest request) {
     return ResponseEntity.ok(productService.updateProduct(productId, request));
   }
 
   @DeleteMapping("/{productId}")
-  public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+  public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
     productService.deleteProduct(productId);
     return ResponseEntity.noContent().build();
   }
 
+  @GetMapping("/check-stock")
+  public ResponseEntity<AvailabilityResponse> checkAvailability(
+      @RequestBody AvailabilityRequest request) {
+    return ResponseEntity.ok()
+        .body(reservationService.checkCartAvailability(request.cartItemRequests()));
+  }
+
+
   @PostMapping("/sync")
   public ResponseEntity<Void> syncProducts() {
     productService.syncProducts();
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/{productId}/reduce-stock")
+  public ResponseEntity<Void> commitReservation() {
     return ResponseEntity.ok().build();
   }
 

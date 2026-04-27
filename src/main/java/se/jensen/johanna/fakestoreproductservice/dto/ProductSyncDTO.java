@@ -1,13 +1,12 @@
 package se.jensen.johanna.fakestoreproductservice.dto;
 
-import java.util.UUID;
-
-public record ProductDTO(
-    UUID productId,
+public record ProductSyncDTO(
+    Long id,
     String title,
     Integer price,
     String description,
     String image
+
 ) {
 
 }
