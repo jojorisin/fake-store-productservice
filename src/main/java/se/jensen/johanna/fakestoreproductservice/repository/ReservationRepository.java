@@ -13,15 +13,6 @@ import se.jensen.johanna.fakestoreproductservice.model.Reservation;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
-  List<Reservation> findByUserId(UUID userId);
-
-
-  @Query("SELECT COALESCE(SUM(ri.quantity), 0) FROM Reservation r " +
-      "JOIN r.reservedItems ri " +
-      "WHERE ri.product.productId = :productId " +
-      "AND r.expiresAt > CURRENT_TIMESTAMP")
-  Integer countActiveReservations(@Param("productId") UUID productId);
-
   @Query("SELECT ri.product.productId as productId, SUM(ri.quantity) as count " +
       "FROM Reservation r JOIN r.reservedItems ri " +
       "WHERE ri.product.productId IN :productIds " +
@@ -32,7 +23,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
       @Param("now") Instant now
   );
 
-  public interface ReservationCountProjection {
+  interface ReservationCountProjection {
 
     UUID getProductId();
 

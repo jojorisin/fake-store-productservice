@@ -15,7 +15,6 @@ import se.jensen.johanna.fakestoreproductservice.dto.AvailabilityResponse;
 import se.jensen.johanna.fakestoreproductservice.dto.CartItemRequest;
 import se.jensen.johanna.fakestoreproductservice.dto.ReservationRequest;
 import se.jensen.johanna.fakestoreproductservice.dto.ReservationResponse;
-import se.jensen.johanna.fakestoreproductservice.mapper.ReservationMapper;
 import se.jensen.johanna.fakestoreproductservice.model.Product;
 import se.jensen.johanna.fakestoreproductservice.model.Reservation;
 import se.jensen.johanna.fakestoreproductservice.model.ReservationItem;
@@ -30,7 +29,6 @@ public class ReservationService {
 
   private final ReservationRepository reservationRepository;
   private final ProductRepository productRepository;
-  private final ReservationMapper reservationMapper;
 
   /**
    * For when orderservice is creating an order. They reserve the cart and gets the reservationID so

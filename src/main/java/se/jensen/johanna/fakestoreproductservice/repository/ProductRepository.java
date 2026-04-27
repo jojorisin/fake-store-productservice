@@ -41,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
   @Query("SELECT p.productId as productId, p.stock as stock FROM Product p WHERE p.productId IN :productIds")
   List<StockProjection> getStockByProductIds(@Param("productIds") Set<UUID> productIds);
 
-  public interface StockProjection {
+  interface StockProjection {
 
     UUID getProductId();
 
