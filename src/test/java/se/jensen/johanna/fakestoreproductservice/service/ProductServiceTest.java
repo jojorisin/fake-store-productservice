@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,14 +39,15 @@ class ProductServiceTest {
   @Mock
   private ProductMapper productMapper;
 
-  private Long productId;
+
+  private UUID productId;
   private Product product;
   private ProductDTO productDTO;
 
   @BeforeEach
   void setUp() {
-    productId = 1L;
-    product = Product.builder().id(productId).title("original title")
+    productId = UUID.randomUUID();
+    product = Product.builder().productId(productId).title("original title")
         .description("original description").price(100).image("original image").build();
     productDTO = new ProductDTO(productId, "title", 100, "description", "image");
   }
@@ -123,7 +125,7 @@ class ProductServiceTest {
 
     ProductDTO result = productService.getProductById(productId);
 
-    assertThat(result.id()).isEqualTo(productId);
+    assertThat(result.productId()).isEqualTo(productId);
   }
 
   @Test
