@@ -58,5 +58,9 @@ public class Reservation {
 
   }
 
+  public void expire() {
+    this.expiresAt = Instant.now();
+  }
+
 
 }

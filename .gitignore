@@ -38,4 +38,5 @@ build/
 report.html
 report.json
 
-public
+
+product.env
