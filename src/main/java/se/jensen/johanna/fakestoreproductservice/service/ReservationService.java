@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import se.jensen.johanna.fakestoreproductservice.repository.ProductRepository.St
 import se.jensen.johanna.fakestoreproductservice.repository.ReservationRepository;
 import se.jensen.johanna.fakestoreproductservice.repository.ReservationRepository.ReservationCountProjection;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -79,7 +81,7 @@ public class ReservationService {
       int available = availableStock.getOrDefault(item.productId(), 0);
       if (available < item.quantity()) {
         allAvailable = false;
-        updatedItems.add(new CartItemRequest(item.productId(), item.quantity()));
+        updatedItems.add(new CartItemRequest(item.productId(), available));
       } else {
         updatedItems.add(item);
       }
@@ -105,6 +107,28 @@ public class ReservationService {
         id -> id,
         id -> stock.getOrDefault(id, 0) - reserved.getOrDefault(id, 0)
     ));
+  }
+
+  /**
+   * Commits a reservation. ATM using expiredAt so the reservation won't hold double stock. I see
+   * advantages with using exernal stockservice so might implement that
+   */
+  @Transactional
+  public void commitReservation(UUID reservationId) {
+    log.info("Committing reservation {}", reservationId);
+    Reservation reservation = reservationRepository.findByReservationId(reservationId)
+        .orElseThrow(() -> {
+          log.error("ReservationId {} not found when trying to commit reservation", reservationId);
+          return new IllegalStateException("Reservation not found");
+        });
+
+    List<ReservationItem> items = reservation.getReservedItems();
+
+    items.forEach(item -> item.getProduct().reduceStock(item.getQuantity()));
+    reservation.expire();
+    log.info("Reservation {} committed", reservationId);
+
+
   }
 
 

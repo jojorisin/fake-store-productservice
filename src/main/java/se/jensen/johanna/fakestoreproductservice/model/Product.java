@@ -82,5 +82,9 @@ public class Product {
     this.image = image;
   }
 
+  public void reduceStock(Integer quantity) {
+    this.stock -= quantity;
+  }
+
 }
 
