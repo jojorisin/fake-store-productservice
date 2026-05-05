@@ -38,7 +38,6 @@ public class Product {
   private String description;
   @Column(columnDefinition = "TEXT")
   private String image;
-  private Integer stock;
   private Instant createdAt;
   private Instant updatedAt;
 
@@ -62,7 +61,6 @@ public class Product {
         .price(price)
         .description(description)
         .image(image)
-        .stock(10)
         .build();
   }
 
@@ -82,9 +80,6 @@ public class Product {
     this.image = image;
   }
 
-  public void reduceStock(Integer quantity) {
-    this.stock -= quantity;
-  }
 
 }
 
