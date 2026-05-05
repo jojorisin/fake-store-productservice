@@ -18,12 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import se.jensen.johanna.fakestoreproductservice.dto.AvailabilityRequest;
-import se.jensen.johanna.fakestoreproductservice.dto.AvailabilityResponse;
 import se.jensen.johanna.fakestoreproductservice.dto.ProductDTO;
 import se.jensen.johanna.fakestoreproductservice.dto.UpdateProductRequest;
 import se.jensen.johanna.fakestoreproductservice.service.ProductService;
-import se.jensen.johanna.fakestoreproductservice.service.ReservationService;
 
 @RestController
 @RequestMapping("/api/products")
@@ -31,7 +28,6 @@ import se.jensen.johanna.fakestoreproductservice.service.ReservationService;
 public class ProductController {
 
   private final ProductService productService;
-  private final ReservationService reservationService;
 
   @GetMapping
   public ResponseEntity<Page<ProductDTO>> getAllProducts(
@@ -57,13 +53,6 @@ public class ProductController {
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping("/check-stock")
-  public ResponseEntity<AvailabilityResponse> checkAvailability(
-      @RequestBody AvailabilityRequest request) {
-    return ResponseEntity.ok()
-        .body(reservationService.checkCartAvailability(request.cartItemRequests()));
-  }
-
 
   @PostMapping("/sync")
   public ResponseEntity<Void> syncProducts() {
@@ -71,10 +60,6 @@ public class ProductController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/{productId}/reduce-stock")
-  public ResponseEntity<Void> commitReservation() {
-    return ResponseEntity.ok().build();
-  }
 
 }
 
