@@ -31,4 +31,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/fake-store-productservice:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/fake-store-productservice:latest
+            ${{ secrets.DOCKER_USERNAME }}/fake-store-productservice:${{ github.sha }}
