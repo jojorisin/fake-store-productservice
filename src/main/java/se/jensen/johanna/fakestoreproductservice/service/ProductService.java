@@ -2,6 +2,7 @@ package se.jensen.johanna.fakestoreproductservice.service;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -120,6 +121,23 @@ public class ProductService {
     } catch (Exception e) {
       log.error("Failed to sync products from fake store {}", e.getMessage(), e);
     }
+  }
+
+  public Boolean productExists(UUID productId) {
+    log.debug("validating product exists. id: {}", productId);
+    return productRepository.existsByProductId(productId);
+  }
+
+  /**
+   * checks if product ids exists and returns list of validated id's
+   */
+  public Set<UUID> validateProductList(Set<UUID> productIds) {
+    log.debug("validating product ids: {}", productIds);
+    if (productIds == null || productIds.isEmpty()) {
+      log.debug("returning empty list.");
+      return Collections.emptySet();
+    }
+    return productRepository.findExistingProductIds(productIds);
   }
 }
 

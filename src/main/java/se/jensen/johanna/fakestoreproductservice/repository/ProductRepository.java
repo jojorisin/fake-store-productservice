@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import se.jensen.johanna.fakestoreproductservice.model.Product;
 
@@ -23,5 +24,10 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
   Set<Long> findAllExternalIds();
 
   List<Product> findAllByProductIdIn(Set<UUID> productIds);
+
+  Boolean existsByProductId(UUID productId);
+
+  @Query("SELECT p.productId FROM Product p WHERE p.productId IN :productIds")
+  Set<UUID> findExistingProductIds(@Param("productIds") Set<UUID> productIds);
 
 }
